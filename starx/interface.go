@@ -50,6 +50,7 @@ func Run() {
 	startup()
 }
 
+
 // Set special server initial function, starx.Set("oneServerType | anotherServerType", func(){})
 func Set(svrTypes string, fn func()) {
 	var types = strings.Split(strings.TrimSpace(svrTypes), "|")

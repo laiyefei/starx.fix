@@ -40,6 +40,8 @@ type Session struct {
 	data      map[string]interface{} // session data store
 	lastTime  int64                  // last heartbeat time
 	serverIDs map[string]string      // map of server type -> server id
+
+	BelongToComponent interface{} //extend for easy find parentComponent
 }
 
 // Create new session instance
@@ -51,6 +53,10 @@ func New(entity NetworkEntity) *Session {
 		lastTime:  time.Now().Unix(),
 		serverIDs: make(map[string]string),
 	}
+}
+
+func (_this *Session) SetBelongToComponent(belonged interface{}) {
+	_this.BelongToComponent = belonged
 }
 
 func (s *Session) ServerID(svrType string) string {

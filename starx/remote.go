@@ -79,7 +79,15 @@ func (rs *remoteService) register(rcvr component.Component) error {
 
 // Server handle request
 func (rs *remoteService) handle(conn net.Conn) {
-	defer conn.Close()
+	var acceptor *acceptor
+	defer func() {
+		conn.Close()
+		if nil != acceptor{
+			for _, v := range acceptor.sessionMap {
+				FindConnLostCallBack(v.BelongToComponent)(v.ID)
+			}
+		}
+	}()
 	// message buffer
 	requestChan := make(chan *unhandledRequest, packetBufferSize)
 	endChan := make(chan bool, 1)
@@ -97,7 +105,7 @@ func (rs *remoteService) handle(conn net.Conn) {
 		}
 	}()
 
-	acceptor := transporter.createAcceptor(conn)
+	acceptor = transporter.createAcceptor(conn)
 	transporter.dumpAcceptor()
 	tmp := make([]byte, 0) // save truncated data
 	buf := make([]byte, 512)

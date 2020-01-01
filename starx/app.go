@@ -21,6 +21,7 @@
 package starx
 
 import (
+	"errors"
 	"fmt"
 	"net"
 	"net/http"
@@ -28,8 +29,8 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/gorilla/websocket"
 	"github.com/chrislonng/starx/log"
+	"github.com/gorilla/websocket"
 )
 
 func welcomeMsg() {
@@ -64,6 +65,32 @@ func startup() {
 	// call by reverse order against register
 	shutdownComps()
 }
+
+//extend -> adder: leaffly
+var ConnLostCallBacks map[interface{}]func(interface{}) = make(map[interface{}]func(interface{}), 0)
+
+func SaveConnLostCallBack(key interface{}, callBack func(interface{})) (err error) {
+	if _, ok := ConnLostCallBacks[key]; !ok {
+		ConnLostCallBacks[key] = callBack
+	} else {
+		err = errors.New("sorry, the callback function is allready in ConnLostCallBacks .")
+	}
+	return err
+}
+func FindConnLostCallBack(key interface{})(fnReturn func(interface{})) {
+	defer func() {
+		if err := recover(); nil != err {
+			log.Error(err)
+			fnReturn = nil
+		}
+	}()
+	if v, ok := ConnLostCallBacks[key]; ok {
+		fnReturn = v
+	}
+
+	return fnReturn
+}
+//========================================
 
 // Enable current server accept connection
 func listenAndServe() {

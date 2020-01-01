@@ -82,10 +82,17 @@ func (hs *handlerService) register(rcvr component.Component) error {
 // Read data from Socket file descriptor and decode it, handle message in
 // individual logic goroutine
 func (hs *handlerService) handle(conn net.Conn) {
-	defer conn.Close()
+	var agent *agent
+	defer func() {
+		conn.Close()
+		//remove session from sessions
+		if nil != agent{
+			FindConnLostCallBack(agent.session.BelongToComponent)(agent.session.ID)
+		}
+	}()
 
 	// register new session when new connection connected in
-	agent := transporter.createAgent(conn)
+	agent = transporter.createAgent(conn)
 	log.Debugf("New session established: %s", agent.String())
 
 	// all user logic will be handled in single goroutine
