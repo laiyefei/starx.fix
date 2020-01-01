@@ -141,7 +141,7 @@ func Info(v ...interface{}) {
 	writeLog(LogInfo, v...)
 }
 
-func Warn(f string, v ...interface{}) {
+func Warn(v ...interface{}) {
 	if logLevel > LevelWarn {
 		return
 	}
