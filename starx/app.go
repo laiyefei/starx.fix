@@ -78,10 +78,10 @@ func SaveConnLostCallBack(key interface{}, callBack func(interface{})) (err erro
 	return err
 }
 func FindConnLostCallBack(key interface{})(fnReturn func(interface{})) {
+	fnReturn = func(interface{}){}
 	defer func() {
 		if err := recover(); nil != err {
 			log.Error(err)
-			fnReturn = nil
 		}
 	}()
 	if v, ok := ConnLostCallBacks[key]; ok {
